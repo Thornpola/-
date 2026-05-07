@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Pola Entertainment | Photography Portfolio & Library</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #0a0c12;
+            color: #f0f0f0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #07090e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255,193,7,0.2);
+            border-top: 4px solid #ffc107;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Typography & Reusable */
+        a { text-decoration: none; color: inherit; }
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 30%, #ffc107 80%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: #b0b8c5;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Header Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 12, 18, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,193,7,0.2);
+            transition: 0.3s;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: -0.5px;
+        }
+        .logo svg {
+            width: 30px;
+            fill: #ffc107;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        .nav-menu li a {
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-menu li a:hover { color: #ffc107; }
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .menu-toggle span {
+            width: 28px;
+            height: 2px;
+            background: #ffc107;
+            transition: 0.2s;
+        }
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 80%;
+                height: calc(100vh - 70px);
+                background: #0f1119;
+                flex-direction: column;
+                padding: 2rem;
+                transition: 0.3s;
+                backdrop-filter: blur(20px);
+                border-right: 1px solid #ffc10730;
+            }
+            .nav-menu.active { left: 0; }
+            .menu-toggle { display: flex; }
+        }
+
+        /* Hero Section */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 40%, #1e1a2f, #03050a);
+            z-index: -2;
+        }
+        .hero-shapes .floating-accent {
+            position: absolute;
+            background: radial-gradient(circle, #ffc10730, transparent);
+            border-radius: 50%;
+            filter: blur(60px);
+            animation: float 12s infinite alternate;
+        }
+        .accent-1 { width: 300px; height: 300px; top: 10%; left: -5%; }
+        .accent-2 { width: 450px; height: 450px; bottom: 0; right: 0; background: #ff990030; animation-duration: 18s; }
+        .accent-3 { width: 250px; height: 250px; top: 50%; left: 70%; background: #ffc10720; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, -30px) scale(1.1); } }
+        .hero-content {
+            text-align: center;
+            z-index: 2;
+            padding: 2rem;
+        }
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #ffde9c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #ffc107;
+            color: #0a0c12;
+            padding: 0.9rem 2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255,193,7,0.3);
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+            background: #ffd966;
+            box-shadow: 0 10px 25px rgba(255,193,7,0.5);
+        }
+
+        /* COVERFLOW SECTION - manual only (no auto) */
+        .portfolio-section {
+            padding: 5rem 1rem;
+            background: #0a0c12;
+        }
+        .coverflow-wrapper {
+            max-width: 1300px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            padding: 2rem 0;
+        }
+        .coverflow-container {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            will-change: transform;
+            align-items: center;
+        }
+        .coverflow-item {
+            flex: 0 0 280px;
+            background: #151a24;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            transform: scale(0.85);
+            opacity: 0.7;
+            filter: brightness(0.85);
+        }
+        .coverflow-item.active {
+            transform: scale(1.05);
+            opacity: 1;
+            filter: brightness(1);
+            box-shadow: 0 30px 40px -12px rgba(0,0,0,0.6), 0 0 0 2px rgba(255,193,7,0.5);
+        }
+        .portfolio-image {
+            width: 100%;
+            height: 340px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s;
+        }
+        .coverflow-item:hover .portfolio-image {
+            transform: scale(1.02);
+        }
+        .portfolio-overlay {
+            padding: 1.2rem;
+            background: linear-gradient(to top, #0f121c, transparent);
+        }
+        .portfolio-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #ffc107;
+        }
+        .portfolio-description {
+            font-size: 0.85rem;
+            color: #bfc9e0;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+        }
+        .coverflow-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0 1rem;
+        }
+        .control-btn {
+            background: #1e2432;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 60px;
+            font-size: 2rem;
+            color: #ffc107;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .control-btn:hover { background: #ffc107; color: #0a0c12; }
+        .indicators {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 10px;
+            background: #4a5568;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .indicator.active {
+            width: 28px;
+            background: #ffc107;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 5rem 2rem;
+            background: #0f121c;
+        }
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        .about-image img {
+            width: 100%;
+            border-radius: 32px;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.5);
+        }
+        .about-content h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .about-content p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            color: #cdd5e6;
+        }
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffc107;
+        }
+        @media (max-width: 800px) {
+            .about-container { grid-template-columns: 1fr; text-align: center; }
+            .stats { justify-content: center; }
+        }
+
+        /* Services */
+        .services-section {
+            padding: 5rem 1rem;
+            background: #0a0c12;
+        }
+        .services-grid {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        .service-card {
+            background: #11141f;
+            border-radius: 28px;
+            padding: 2rem;
+            transition: 0.2s;
+            border: 1px solid #282e3c;
+        }
+        .service-card:hover { transform: translateY(-8px); border-color: #ffc107; }
+        .service-icon svg {
+            width: 45px;
+            fill: #ffc107;
+        }
+        .service-title {
+            font-size: 1.5rem;
+            margin: 1rem 0 0.5rem;
+        }
+        .service-price {
+            color: #ffc107;
+            font-weight: 700;
+            margin-top: 1rem;
+        }
+
+        /* Contact */
+        .contact-section {
+            padding: 4rem 1rem;
+            background: #0f121c;
+        }
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .contact-item {
+            background: #181e2a;
+            padding: 1.5rem 2rem;
+            border-radius: 48px;
+            text-align: center;
+            min-width: 200px;
+            transition: 0.2s;
+        }
+        .contact-item:hover { background: #ffc10720; transform: scale(1.02); }
+        .contact-icon svg { width: 35px; fill: #ffc107; }
+        .contact-label { font-weight: 600; margin: 0.5rem 0; }
+        footer {
+            background: #05070c;
+            padding: 2rem;
+            text-align: center;
+        }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .social-link svg {
+            width: 26px;
+            fill: #9aa3b9;
+            transition: 0.2s;
+        }
+        .social-link:hover svg { fill: #ffc107; }
+        .footer-text {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 680px) {
+            .coverflow-item { flex: 0 0 240px; }
+            .portfolio-image { height: 280px; }
+        }
+        /* download button inside overlay small adjust */
+        .portfolio-overlay .cta-button {
+            display: inline-block;
+            font-size: 0.8rem;
+            padding: 0.4rem 1rem;
+            margin-top: 0.75rem;
+            background: #ffc107;
+            color: #0a0c12;
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+    <div class="loader"></div>
+</div>
+
+<header id="header">
+    <nav>
+        <a href="#home" class="logo">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20C16.4 20 20 16.4 20 12C20 7.6 16.4 4 12 4C7.6 4 4 7.6 4 12C4 16.4 7.6 20 12 20M12 2C18.5 2 22 6.5 22 12C22 17.5 17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2M14.3 16.2L12 10L9.7 16.2L7 11.3L11.3 7L16.2 9.7L14.3 16.2M8.8 17L12 8L15.2 17L20 12L15.2 7L12 15L8.8 7L4 12L8.8 17Z"/></svg>
+            Pola Entertainment
+        </a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#portfolio">Book</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="menu-toggle" id="menuToggle">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+</header>
+
+<!-- Hero -->
+<section class="hero-section" id="home">
+    <div class="hero-bg"></div>
+    <div class="hero-shapes"><div class="floating-accent accent-1"></div><div class="floating-accent accent-2"></div><div class="floating-accent accent-3"></div></div>
+    <div class="hero-content reveal">
+        <h1 class="hero-title">សូមស្វាគមន៍ មកថ្នាក់រៀន</h1>
+        <p class="hero-subtitle">លោកគ្រូ ម៉មសំឡី</p>
+        <a href="#portfolio" class="cta-button">សូមចុច</a>
+    </div>
+</section>
+
+<!-- Portfolio / Book Library (Coverflow - Manual Only, No Auto) -->
+<section class="portfolio-section" id="portfolio">
+    <div class="section-header reveal">
+        <h2 class="section-title">Expermental Methodology</h2>
+        <p class="section-subtitle">សូមជ្រើសរើសសៀវភៅដែលអ្នកចង់អាន</p>
+    </div>
+    <div class="coverflow-wrapper">
+        <div class="coverflow-container" id="coverflowContainer">
+            <!-- Item 0: SPSS -->
+            <div class="coverflow-item" data-index="0">
+                <img src="/images/Jpg.jpg" alt="SPSS Guide" class="portfolio-image" onerror="this.src='https://placehold.co/600x400/1e2432/ffc107?text=SPSS'">
+                <div class="portfolio-overlay">
+                    <h3 class="portfolio-title">ការណែនាំអំពីកម្មវិធី SPSS</h3>
+                    <p class="portfolio-description">SPSS គឺជាសំណុំ ប្រើដើម្បីវិភាគទិន្នន័យប្រកបដោយប្រសិទ្ធភាព និងគ្រប់គ្រងទិន្នន័យជាប្រព័ន្ធ។</p>
+                    <a href="/ការណែនាំអំពីកម្មវិធី_SPSS.pdf" class="cta-button">ទាញយក</a>
+                </div>
+            </div>
+            <div class="coverflow-item" data-index="1">
+                <img src="/images/2.jpg" alt="RCBD Model" class="portfolio-image" onerror="this.src='https://placehold.co/600x400/1e2432/ffc107?text=RCBD'">
+                <div class="portfolio-overlay">
+                    <h3 class="portfolio-title">គំរូប្លង់ RCBD</h3>
+                    <p class="portfolio-description">ការវិភាគទិន្នន័យតាមកម្មវិធីSPSSគំរូប្លង់ RCBD</p>
+                    <a href="/RCBD.pdf" class="cta-button">ទាញយក</a>
+                </div>
+            </div>
+            <div class="coverflow-item" data-index="2">
+                <img src="/images/3.jpg" alt="Experimental Design" class="portfolio-image" onerror="this.src='https://placehold.co/600x400/1e2432/ffc107?text=Design'">
+                <div class="portfolio-overlay">
+                    <h3 class="portfolio-title">ការរៀបចំផែនការពិសោធន៍</h3>
+                    <p class="portfolio-description">ការរៀបចំផែការសាកល្បងដោយចៃដន្យនៅក្នុងប្លុងពេញលេញ</p>
+                    <a href="/RCB.pdf" class="cta-button">ទាញយក</a>
+                </div>
+            </div>
+            <div class="coverflow-item" data-index="3">
+                <img src="/images/11.png" alt="Factor Analysis" class="portfolio-image" onerror="this.src='https://placehold.co/600x400/1e2432/ffc107?text=SPSS+Analysis'">
+                <div class="portfolio-overlay">
+                    <h3 class="portfolio-title">ការវិភាគកត្តានៃលទ្ធផលពិសោធន៍ដោយប្រើកម្មវិធី SPSS</h3>
+                    <p class="portfolio-description">ការវិភាគកត្តា និងលទ្ធផលពិសោធន៍កម្រិតខ្ពស់</p>
+                    <a href="/SPSS T samley.1.pdf.crdownload.pdf" class="cta-button">ទាញយក</a>
+                </div>
+            </div>
+            <div class="coverflow-item" data-index="4">
+                <img src="/images/22.png" alt="Factorial Design" class="portfolio-image" onerror="this.src='https://placehold.co/600x400/1e2432/ffc107?text=Factorial'">
+                <div class="portfolio-overlay">
+                    <h3 class="portfolio-title">ការរៀបចំបច្ច័យពិសោធន៍ដែលមាន 3Factor, 2level​ក្នុងCRD</h3>
+                    <p class="portfolio-description">ស្វែងយល់ពីការរចនា Factorial ក្នុង CRD</p>
+                    <a href="/04. Factorial (3 ปัจจัย).pptx ១.pdf.crdownload" class="cta-button">ទាញយក</a>
+                </div>
+            </div>
+            <div class="coverflow-item" data-index="5">
+                <img src="/images/33.png" alt="CRD" class="portfolio-image" onerror="this.src='https://placehold.co/600x400/1e2432/ffc107?text=CRD'">
+                <div class="portfolio-overlay">
+                    <h3 class="portfolio-title">ការរៀបចំផែនការដោយចៃដន្យ</h3>
+                    <p class="portfolio-description">Completely Randomized Design (CRD) មូលដ្ឋានគ្រឹះ</p>
+                    <a href="/images/photo_2026-01-26_12-43-09.jpg" class="cta-button">ទាញយក</a>
+                </div>
+            </div>
+            <div class="coverflow-item" data-index="6">
+                <img src="/images/44.png" alt="Factorial Management" class="portfolio-image" onerror="this.src='https://placehold.co/600x400/1e2432/ffc107?text=Factorial+Control'">
+                <div class="portfolio-overlay">
+                    <h3 class="portfolio-title">ការគ្រប់គ្រងការពិសោធន៏ Factorial</h3>
+                    <p class="portfolio-description">វិធីសាស្រ្តគ្រប់គ្រងកត្តាច្រើនក្នុងការពិសោធន៍</p>
+                    <a href="/factorial.pdf.crdownload" class="cta-button">ទាញយក</a>
+                </div>
+            </div>
+        </div>
+        <div class="coverflow-controls">
+            <button class="control-btn" id="prevBtn">‹</button>
+            <button class="control-btn" id="nextBtn">›</button>
+        </div>
+        <div class="indicators" id="indicators"></div>
+    </div>
+</section>
+
+<!-- About -->
+<section class="about-section" id="about">
+    <div class="about-container reveal">
+        <div class="about-image"><img src="/images/photo_2026-01-26_12-43-09.jpg" alt="Photographer" onerror="this.src='https://placehold.co/800x600/1e2432/ffc107?text=Mam+Samley'"></div>
+        <div class="about-content">
+            <h2>Mam Samley</h2>
+            <p>អ្នកឯកទេសខាងវិធីសាស្ត្រស្រាវជ្រាវ និងការវិភាគទិន្នន័យ។ លោកគ្រូមានបទពិសោធន៍ជក្នុងការបង្រៀន និងណែនាំនិស្សិតឱ្យយល់ដឹងពីការរចនាពិសោធន៍ និងកម្មវិធី SPSS។</p>
+            <div class="stats">
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact -->
+<section class="contact-section" id="contact">
+    <div class="section-header reveal"><h2 class="section-title">រៀបរៀងដោយ : ថន ប៉ូឡា</h2><p class="section-subtitle">ទំនាក់ទំនងសម្រាប់ព័ត៌មានបន្ថែម</p></div>
+    <div class="contact-info reveal">
+        <a href="mailto:thornpola6@gmail.com" class="contact-item"><div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z"/></svg></div><div class="contact-label">Email</div><div class="contact-value">thornpola6@gmail.com</div></a>
+        <a href="tel:+855884554566" class="contact-item"><div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M6.62 10.79C8.06 13.62 10.38 15.94 13.21 17.38L15.41 15.18C15.69 14.9 16.08 14.82 16.43 14.93C17.55 15.3 18.75 15.5 20 15.5C20.55 15.5 21 15.95 21 16.5V20C21 20.55 20.55 21 20 21C10.61 21 3 13.39 3 4C3 3.45 3.45 3 4 3H7.5C8.05 3 8.5 3.45 8.5 4C8.5 5.25 8.7 6.45 9.07 7.57C9.18 7.92 9.1 8.31 8.82 8.59L6.62 10.79Z"/></svg></div><div class="contact-label">Phone</div><div class="contact-value">088 455 4566</div></a>
+        <a href="#" class="contact-item"><div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9S10.62 6.5 12 6.5S14.5 7.62 14.5 9S13.38 11.5 12 11.5Z"/></svg></div><div class="contact-label">Studio</div><div class="contact-value">Kampong Speu Institute of Technology</div></a>
+    </div>
+</section>
+
+<footer>
+    <div class="social-links">
+        <a href="#" class="social-link"><svg viewBox="0 0 24 24"><path d="M7.8 2H16.2C19.4 2 22 4.6 22 7.8V16.2C22 19.4 19.4 22 16.2 22H7.8C4.6 22 2 19.4 2 16.2V7.8C2 4.6 4.6 2 7.8 2M7.6 4C5.61 4 4 5.61 4 7.6V16.4C4 18.39 5.61 20 7.6 20H16.4C18.39 20 20 18.39 20 16.4V7.6C20 5.61 18.39 4 16.4 4H7.6M17.25 5.5C17.94 5.5 18.5 6.06 18.5 6.75S17.94 8 17.25 8S16 7.44 16 6.75S16.56 5.5 17.25 5.5M12 7C14.76 7 17 9.24 17 12S14.76 17 12 17S7 14.76 7 12S9.24 7 12 7M12 9C10.34 9 9 10.34 9 12S10.34 15 12 15S15 13.66 15 12S13.66 9 12 9Z"/></svg></a>
+        <a href="#" class="social-link"><svg viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96C18.34 21.21 22 17.06 22 12.06C22 6.53 17.5 2.04 12 2.04Z"/></svg></a>
+        <a href="#" class="social-link"><svg viewBox="0 0 24 24"><path d="M22.46 6C21.69 6.35 20.86 6.58 20 6.69C20.88 6.16 21.56 5.32 21.88 4.31C21.05 4.81 20.13 5.16 19.16 5.36C18.37 4.5 17.26 4 16 4C13.65 4 11.73 5.92 11.73 8.29C11.73 8.63 11.77 8.96 11.84 9.27C8.28 9.09 5.11 7.38 3 4.79C2.63 5.42 2.42 6.16 2.42 6.94C2.42 8.43 3.17 9.75 4.33 10.5C3.62 10.5 2.96 10.3 2.38 10V10.03C2.38 12.11 3.86 13.85 5.82 14.24C5.46 14.34 5.08 14.39 4.69 14.39C4.42 14.39 4.15 14.36 3.89 14.31C4.43 16 6 17.26 7.89 17.29C6.43 18.45 4.58 19.13 2.56 19.13C2.22 19.13 1.88 19.11 1.54 19.07C3.44 20.29 5.74 21 8.23 21C16 21 20.33 14.46 20.33 8.79C20.33 8.6 20.33 8.42 20.32 8.23C21.16 7.63 21.88 6.87 22.46 6Z"/></svg></a>
+    </div>
+    <p class="footer-text">© 2026 Pola Entertainment Photography. All rights reserved.<br>Thorn Pola</p>
+</footer>
+
+<script>
+    (function() {
+        // Loading screen
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loadingScreen');
+            if(loader) {
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 600);
+                }, 400);
+            }
+        });
+
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        if(menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.addEventListener('click', () => navMenu.classList.remove('active'));
+            });
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if(targetId === "#" || targetId === "") return;
+                const targetEl = document.querySelector(targetId);
+                if(targetEl) {
+                    e.preventDefault();
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // ---------- MANUAL COVERFLOW (NO AUTOPLAY) ----------
+        const container = document.getElementById('coverflowContainer');
+        const items = Array.from(document.querySelectorAll('.coverflow-item'));
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const indicatorsContainer = document.getElementById('indicators');
+
+        let activeIndex = 0;
+
+        // Create indicators
+        function buildIndicators() {
+            indicatorsContainer.innerHTML = '';
+            items.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.classList.add('indicator');
+                if(idx === activeIndex) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    setActiveIndex(idx, true);
+                });
+                indicatorsContainer.appendChild(dot);
+            });
+        }
+
+        function updateIndicators() {
+            const dots = document.querySelectorAll('.indicator');
+            dots.forEach((dot, i) => {
+                if(i === activeIndex) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+        }
+
+        // Get current transform X
+        function getComputedTransformX(el) {
+            const style = window.getComputedStyle(el);
+            const transform = style.transform;
+            if(transform === 'none') return 0;
+            const matrix = transform.match(/matrix.*\((.+)\)/);
+            if(matrix) {
+                const values = matrix[1].split(', ');
+                return parseFloat(values[4]) || 0;
+            }
+            return 0;
+        }
+
+        // Center the active item in wrapper
+        function centerActiveItem(instant = false) {
+            if(!container || items.length === 0) return;
+            const activeItem = items[activeIndex];
+            if(!activeItem) return;
+            const wrapperRect = container.parentElement.getBoundingClientRect();
+            const itemRect = activeItem.getBoundingClientRect();
+            const wrapperCenter = wrapperRect.left + wrapperRect.width / 2;
+            const itemCenter = itemRect.left + itemRect.width / 2;
+            let offset = wrapperCenter - itemCenter;
+            const currentTransform = getComputedTransformX(container);
+            const newTranslate = currentTransform + offset;
+            const containerWidth = container.scrollWidth;
+            const wrapperWidth = wrapperRect.width;
+            const minTranslate = wrapperWidth - containerWidth;
+            const maxTranslate = 0;
+            const clamped = Math.min(maxTranslate, Math.max(minTranslate, newTranslate));
+            container.style.transition = instant ? 'none' : 'transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+            container.style.transform = `translateX(${clamped}px)`;
+            if(instant) setTimeout(() => { container.style.transition = ''; }, 50);
+        }
+
+        function updateActiveStyles() {
+            items.forEach((item, idx) => {
+                if(idx === activeIndex) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            updateIndicators();
+        }
+
+        function setActiveIndex(newIndex, smoothCenter = true) {
+            if(newIndex < 0) newIndex = items.length - 1;
+            if(newIndex >= items.length) newIndex = 0;
+            activeIndex = newIndex;
+            updateActiveStyles();
+            centerActiveItem(!smoothCenter);
+        }
+
+        // manual navigation only
+        function nextSlide() { setActiveIndex(activeIndex + 1, true); }
+        function prevSlide() { setActiveIndex(activeIndex - 1, true); }
+
+        // Add click on each coverflow-item to select manually (user's own selection)
+        items.forEach((item, idx) => {
+            item.addEventListener('click', (e) => {
+                // Prevent conflict if user clicks directly on download link (should not override download)
+                if(e.target.closest('a')) return;  // if click on anchor link, allow download but still keep active? we just don't change index but fine
+                if(idx !== activeIndex) {
+                    setActiveIndex(idx, true);
+                }
+            });
+        });
+
+        prevBtn.addEventListener('click', () => { prevSlide(); });
+        nextBtn.addEventListener('click', () => { nextSlide(); });
+
+        window.addEventListener('resize', () => { centerActiveItem(true); });
+        
+        // init coverflow
+        buildIndicators();
+        updateActiveStyles();
+        setTimeout(() => {
+            centerActiveItem(true);
+        }, 120);
+        
+        window.addEventListener('load', () => { centerActiveItem(true); });
+
+        // REVEAL ON SCROLL
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.2, rootMargin: '0px 0px -50px 0px' });
+        revealElements.forEach(el => observer.observe(el));
+        
+        // manual trigger for any visible reveal
+        document.querySelectorAll('.reveal').forEach(el => {
+            if(el.getBoundingClientRect().top < window.innerHeight) el.classList.add('active');
+        });
+    })();
+</script>
+</body>
+</html>
