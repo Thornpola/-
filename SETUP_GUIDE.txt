@@ -1,0 +1,196 @@
+# 🎬 Pola Entertainment - Server Setup Complete!
+
+## ✅ Everything is Ready
+
+Your development server is **live** at:
+```
+http://localhost:3000
+```
+
+---
+
+## 🚀 Quick Access
+
+### Website
+- **Main Site:** http://localhost:3000
+- **Portfolio API:** http://localhost:3000/api/portfolio
+- **Config API:** http://localhost:3000/api/config
+
+### Contact Form
+Click on any contact item in the Contact section to open the form.
+Submissions are logged to the server console.
+
+---
+
+## 📂 File Structure
+
+```
+library/
+├── public/
+│   ├── index.html          ← Main website (with dynamic URLs)
+│   ├── config.js           ← URL configuration
+│   ├── images/             ← Add your images here
+│   └── pdfs/               ← Add your PDFs here
+├── server.py               ← Backend server (running now)
+├── .env                    ← Configuration file
+└── README.md               ← Full documentation
+```
+
+---
+
+## 📝 Add Your Content
+
+### 1. Add Images
+Place your portfolio images in:
+```
+d:\wep\library\public\images\
+```
+Example: `Jpg.jpg`, `2.jpg`, `3.jpg`, `photo_2026-01-26_12-43-09.jpg`
+
+### 2. Add PDFs
+Place your PDF files in:
+```
+d:\wep\library\public\pdfs\
+```
+Example: `SPSS.pdf`, `RCBD.pdf`, `RCB.pdf`
+
+### 3. Update Portfolio Items
+Edit `server.py` - update `PORTFOLIO_DATA` with your content:
+```python
+PORTFOLIO_DATA = [
+    {
+        "id": 0,
+        "title": "Your Title",
+        "description": "Your description",
+        "image": "/images/your-image.jpg",
+        "pdf": "/pdfs/your-file.pdf"
+    },
+    ...
+]
+```
+
+---
+
+## 🔧 Configuration
+
+### Change Port
+Edit `.env`:
+```
+PORT=3000  ← Change this
+```
+
+### Production URL
+Edit `.env`:
+```
+PROD_URL=https://your-domain.com
+PROD_API_URL=https://your-domain.com/api
+```
+
+### Contact Email
+Edit `server.py`:
+```python
+'contactEmail': 'your-email@example.com',  ← Update this
+```
+
+---
+
+## 📡 API Endpoints
+
+### GET /api/config
+Returns server configuration:
+```json
+{
+  "environment": "development",
+  "baseUrl": "http://localhost:3000",
+  "apiUrl": "http://localhost:3000/api",
+  "contactEmail": "thornpola6@gmail.com",
+  "phone": "+855 88 455 4566"
+}
+```
+
+### GET /api/portfolio
+Returns portfolio items with images and PDFs.
+
+### POST /api/contact
+Submit contact form:
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "subject": "Inquiry",
+  "message": "Message content"
+}
+```
+
+---
+
+## 🛑 Stop the Server
+
+Press `CTRL+C` in the terminal where the server is running.
+
+---
+
+## 🚀 Restart the Server
+
+```bash
+cd d:\wep\library
+python server.py
+```
+
+---
+
+## 📦 Technologies Used
+
+- **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
+- **Backend:** Flask (Python)
+- **API:** RESTful endpoints
+- **Features:** 
+  - Dynamic URL configuration
+  - Portfolio management
+  - Contact form handling
+  - CORS support
+  - Static file serving
+
+---
+
+## 💡 Tips
+
+1. **Images Load:** Place images in `public/images/` - they'll be served at `/images/name.jpg`
+2. **PDFs Work:** Place PDFs in `public/pdfs/` - they'll be served at `/pdfs/name.pdf`
+3. **API Test:** Visit http://localhost:3000/api/config to test the API
+4. **Console Logs:** Check terminal for debug messages and contact submissions
+5. **Development Mode:** Server auto-reloads on file changes
+
+---
+
+## 🌐 Production Deployment
+
+### Vercel (Recommended)
+1. Install Vercel CLI
+2. Run `vercel` in project directory
+3. Follow prompts
+
+### Heroku
+```bash
+git push heroku main
+```
+
+### Traditional Server
+```bash
+python server.py  # In production environment
+```
+
+---
+
+## 📞 Support
+
+For issues:
+1. Check the terminal for error messages
+2. Verify images/PDFs are in correct folders
+3. Ensure port 3000 is not in use
+4. Check `.env` configuration
+
+---
+
+**✅ Your portfolio is ready to go!**
+Start customizing and adding your content.
